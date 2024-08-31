@@ -1,6 +1,7 @@
 package com.example.james_code_challenge.mock
 
 import com.example.james_code_challenge.data.model.Card
+import com.example.james_code_challenge.data.model.FavouriteItem
 import com.example.james_code_challenge.data.model.Icon
 import com.example.james_code_challenge.data.model.Phase
 import com.example.james_code_challenge.data.model.Procedure
@@ -59,5 +60,7 @@ class MockData {
             "2015-06-04T17:13:48.440",
             999
         )
+
+        val favouriteItemMock = FavouriteItem(procedureMock.uuid, procedureMock)
     }
 }

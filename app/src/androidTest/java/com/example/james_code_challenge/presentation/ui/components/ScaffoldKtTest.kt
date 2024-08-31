@@ -1,7 +1,10 @@
 package com.example.james_code_challenge.presentation.ui.components
 
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -24,13 +27,24 @@ class ScaffoldKtTest {
 
     private val errorScreenMessage = "Something went wrong, please try again later"
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
     fun testScaffold_showsCorrectTab_canSuccessfullySwapBetween() {
+        val procedureList = listOf(
+            MockData.procedureMock,
+            MockData.procedureMock.copy(uuid = "1"),
+            MockData.procedureMock.copy(uuid = "12")
+        )
+        val favouriteList = listOf(MockData.procedureMock)
+
         composeTestRule.setContent {
             ProceduresScaffold(
+                SnackbarHostState(),
                 {
                     ProceduresScreen(
-                        uiState = MainViewModel.ProceduresState(items = listOf(MockData.procedureMock)),
+                        uiState = MainViewModel.ProceduresState(
+                            items = procedureList
+                        ),
                         fetchProcedureDetailEvent = {},
                         onFavouriteToggleEvent = {},
                         fetchProceduresAndFavourites = {},
@@ -39,11 +53,9 @@ class ScaffoldKtTest {
                 },
                 {
                     FavouritesScreen(
-                        uiState = MainViewModel.FavouritesState(
-                            listOf(
-                                MockData.procedureMock,
-                                MockData.procedureMock.copy(uuid = "1")
-                            )
+                        uiState = MainViewModel.ProceduresState(
+                            items = favouriteList,
+                            favouriteItems = favouriteList
                         ),
                         onFavouriteToggleEvent = {},
                         fetchFavourites = {},
@@ -62,10 +74,16 @@ class ScaffoldKtTest {
 
         // Swap to other tab
         composeTestRule.onNodeWithText("Favourites").performClick()
+        composeTestRule.waitUntilNodeCount(
+            matcher = hasTestTag(FAVOURITES_TEST_TAG),
+            count = 1,
+            5000L
+        )
+        composeTestRule.waitForIdle()
 
         // Shows correct tab after swapping
-        composeTestRule.onNodeWithTag(PROCEDURE_LIST_TEST_TAG).assertIsNotDisplayed()
         composeTestRule.onNodeWithTag(FAVOURITES_TEST_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(PROCEDURE_LIST_TEST_TAG).assertIsNotDisplayed()
 
         composeTestRule.onNodeWithTag(errorScreenMessage).assertIsNotDisplayed()
     }

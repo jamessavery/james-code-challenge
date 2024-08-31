@@ -20,9 +20,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.james_code_challenge.R
@@ -35,8 +38,12 @@ import com.example.james_code_challenge.presentation.viewmodel.MainViewModel
 
 /***
  * Favourites screen which shows just the users' favourited procedures
- * TODO explain all params
- *
+ * @param uiState: Current state of screen - containing procedures, favourited DB items error states, etc
+ * @param fetchFavourites: Lambda to query DB for users' favourite procedures
+ * @param showBottomSheet: Current bottomSheet status
+ * @param onFavouriteToggleEvent: Lambda to insert currently selected procedure into DB as a favourite
+ * @param onFetchProcedureDetailEvent: Lambda sends API request to fetch details of currently selected procedure, to load into BottomSheet
+ * @param isFavourite: queries if currently selected procedure is part of favourites DB
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,6 +114,7 @@ fun FavouritesScreen(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FavouritesList(
     modifier: Modifier = Modifier,
@@ -124,6 +132,9 @@ fun FavouritesList(
     LazyColumn(
         modifier = modifier
             .fillMaxHeight()
+            .semantics {
+                testTagsAsResourceId = true
+            }
             .testTag(FAVOURITES_TEST_TAG)
     ) {
         items(

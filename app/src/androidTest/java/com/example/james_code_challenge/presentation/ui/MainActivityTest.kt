@@ -2,14 +2,27 @@ package com.example.james_code_challenge.presentation.ui
 
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
-
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.test.assertAll
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToIndex
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeDown
+import androidx.test.espresso.Espresso
 import com.example.james_code_challenge.mock.MockData
+import com.example.james_code_challenge.mock.MockData.Companion.procedureDetailMock
+import com.example.james_code_challenge.mock.MockData.Companion.procedureMock
+import com.example.james_code_challenge.presentation.ui.MainActivity.Companion.FAVOURITE_BUTTON_TEST_TAG
+import com.example.james_code_challenge.presentation.ui.MainActivity.Companion.PROCEDURE_LIST_TEST_TAG
 import com.example.james_code_challenge.presentation.ui.MainActivity.Companion.PROGRESS_ICON_TEST_TAG
+import com.example.james_code_challenge.presentation.ui.components.BottomSheet.Companion.BOTTOM_SHEET_TEST_TAG
+import com.example.james_code_challenge.presentation.ui.components.Card.Companion.IMAGE_CONTENT_DESCRIPTION
 import com.example.james_code_challenge.presentation.ui.screens.ProceduresScreen
 import com.example.james_code_challenge.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -40,6 +53,66 @@ class MainActivityTest {
     @Before
     fun setup() {
         hiltRule.inject()
+    }
+
+    @Test
+    fun testProceduresTab_scrollDownAndClickOnProcedure_opensBottomSheetAndDismisses_favouriteStatePersistsBetweenBoth() {
+        val itemToClick = "itemToClick"
+        val uuidToClick = "7"
+        mockProcedureList.add(procedureMock.copy(uuid = "5"))
+        mockProcedureList.add(procedureMock.copy(uuid = "6"))
+        mockProcedureList.add(procedureMock.copy(uuid = uuidToClick, name = itemToClick))
+        mockProcedureList.add(procedureMock.copy(uuid = "8"))
+
+        val favouriteUnselected = Color.LightGray
+        val favouriteSelected = Color.Red
+
+        composeTestRule.activity.setContent {
+            ProcedureScreenUnderTest(
+                uiState = MainViewModel.ProceduresState(
+                    isLoading = false,
+                    items = mockProcedureList,
+                    selectedProcedureDetail = procedureDetailMock
+                )
+            )
+        }
+
+        // Correct tab & items displayed
+        composeTestRule.onNodeWithTag(PROCEDURE_LIST_TEST_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(errorScreenMessage).assertIsNotDisplayed()
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TEST_TAG).assertIsNotDisplayed()
+        composeTestRule.onAllNodes(androidx.compose.ui.test.hasContentDescription(IMAGE_CONTENT_DESCRIPTION))
+            .assertAll(hasText(procedureMock.name))
+
+        // Scroll down & click
+        composeTestRule.onNodeWithTag(PROCEDURE_LIST_TEST_TAG).performScrollToIndex(mockProcedureList.size - 1)
+        composeTestRule.onNodeWithText(itemToClick).performClick()
+        composeTestRule.waitForIdle()
+
+        // Bottom sheet displayed & favourite button works
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TEST_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("$uuidToClick$FAVOURITE_BUTTON_TEST_TAG$favouriteUnselected").assertIsDisplayed() // Assert button in unclicked state
+        composeTestRule.onNodeWithTag("$uuidToClick$FAVOURITE_BUTTON_TEST_TAG$favouriteUnselected").performClick()
+        composeTestRule.onNodeWithTag("$uuidToClick$FAVOURITE_BUTTON_TEST_TAG$favouriteSelected").assertIsDisplayed() // Assert button in clicked state
+
+        // Back press should dismiss Bottomsheet
+        Espresso.pressBack()
+
+        // Bottomsheet dismissed & favourite button state reflects what was set in Bottomsheet
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TEST_TAG).assertIsNotDisplayed()
+        composeTestRule.onNodeWithTag("$uuidToClick$FAVOURITE_BUTTON_TEST_TAG$favouriteSelected").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("$uuidToClick$FAVOURITE_BUTTON_TEST_TAG$favouriteSelected").performClick()
+        composeTestRule.onNodeWithTag("$uuidToClick$FAVOURITE_BUTTON_TEST_TAG$favouriteUnselected").assertIsDisplayed()
+
+        // Reopen Bottomsheet
+        composeTestRule.onNodeWithText(itemToClick).performClick()
+
+        // Ensure swiping down dismisses the Bottomsheet
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TEST_TAG).performTouchInput {
+            swipeDown(durationMillis = 5000L)
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TEST_TAG).assertIsNotDisplayed()
     }
 
     @Test
@@ -91,11 +164,10 @@ class MainActivityTest {
             fetchProcedureDetailEvent = {},
             onFavouriteToggleEvent = {},
             fetchProceduresAndFavourites = {},
-            fetchFavourites = {},
-            isFavourite = { true }
+            isFavourite = { false }
         )
     }
 
-    // Skipping on FavouritesScreen UI tests, hopefully above demonstrates what I would have done
+    // D_N: Not going for 100% coverage here, hopefully the tests above & spread across the project demonstrate what I'm capable of
 
 }

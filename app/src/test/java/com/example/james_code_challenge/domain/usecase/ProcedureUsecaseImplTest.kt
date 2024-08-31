@@ -4,10 +4,11 @@ import com.example.james_code_challenge.data.repository.ProcedureRepository
 import com.example.james_code_challenge.mock.MockData
 import com.example.james_code_challenge.util.Result
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -26,7 +27,7 @@ class ProcedureUsecaseImplTest {
     }
 
     @Test
-    fun `WHEN getProcedureList() THEN return success`() = runBlocking {
+    fun `WHEN getProcedureList() THEN return success`() = runTest {
         // given
         val expectedProcedures = listOf(MockData.procedureMock)
         coEvery { procedureRepoMock.getProcedureList() } returns flowOf(
@@ -41,10 +42,11 @@ class ProcedureUsecaseImplTest {
         // then
         assert(result is Result.Success)
         assertEquals(expectedProcedures, (result as Result.Success).data)
+        coVerify { procedureRepoMock.getProcedureList() }
     }
 
     @Test
-    fun `WHEN getProcedureList() THEN return error`() = runBlocking {
+    fun `WHEN getProcedureList() THEN return error`() = runTest {
         // given
         val expectedError = Exception("Error")
         coEvery { procedureRepoMock.getProcedureList() } returns flowOf(Result.Error(expectedError))
@@ -55,10 +57,11 @@ class ProcedureUsecaseImplTest {
         // then
         assert(result is Result.Error)
         assertEquals(expectedError, (result as Result.Error).exception)
+        coVerify { procedureRepoMock.getProcedureList() }
     }
 
     @Test
-    fun `WHEN getProcedureDetail() THEN return success`() = runBlocking {
+    fun `WHEN getProcedureDetail() THEN return success`() = runTest {
         // given
         val expectedProcedureDetail = MockData.procedureDetailMock
         coEvery { procedureRepoMock.getProcedureDetail(procedureId) } returns flowOf(
@@ -73,10 +76,11 @@ class ProcedureUsecaseImplTest {
         // then
         assert(result is Result.Success)
         assertEquals(expectedProcedureDetail, (result as Result.Success).data)
+        coVerify { procedureRepoMock.getProcedureDetail(procedureId) }
     }
 
     @Test
-    fun `WHEN getProcedureDetail() THEN return error`() = runBlocking {
+    fun `WHEN getProcedureDetail() THEN return error`() = runTest {
         // given
         val expectedError = Exception("Error")
         coEvery { procedureRepoMock.getProcedureDetail(procedureId) } returns flowOf(
@@ -91,6 +95,7 @@ class ProcedureUsecaseImplTest {
         // then
         assert(result is Result.Error)
         assertEquals(expectedError, (result as Result.Error).exception)
+        coVerify { procedureRepoMock.getProcedureDetail(procedureId) }
     }
 
 }

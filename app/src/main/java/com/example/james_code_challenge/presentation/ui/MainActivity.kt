@@ -39,6 +39,7 @@ class MainActivity : ComponentActivity() {
         const val PROCEDURE_LIST_TEST_TAG = "procedure_list_test_tag"
         const val FAVOURITES_TEST_TAG = "favourites_test_tag"
         const val PROGRESS_ICON_TEST_TAG = "progress_icon_test_tag"
+        const val FAVOURITE_BUTTON_TEST_TAG = "favourite_button_test_tag"
     }
 }
 

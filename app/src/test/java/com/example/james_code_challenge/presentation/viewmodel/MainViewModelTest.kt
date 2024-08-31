@@ -1,5 +1,6 @@
 package com.example.james_code_challenge.presentation.viewmodel
 
+import android.content.Context
 import com.example.james_code_challenge.domain.usecase.FavouritesUsecase
 import com.example.james_code_challenge.domain.usecase.ProcedureUsecase
 import com.example.james_code_challenge.mock.MockData
@@ -11,9 +12,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -26,6 +27,7 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class MainViewModelTest {
 
+    private val applicationContextMock = mockk<Context>(relaxed = true)
     private val procedureUsecaseMock = mockk<ProcedureUsecase>(relaxed = true)
     private val favouritesUsecaseMock = mockk<FavouritesUsecase>(relaxed = true)
 
@@ -37,6 +39,7 @@ class MainViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         viewModel = MainViewModel(
+            applicationContextMock,
             procedureUsecase = procedureUsecaseMock,
             favouritesUsecase = favouritesUsecaseMock
         )
@@ -49,8 +52,8 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `GIVEN fetchProcedureList() WHEN loads on init THEN emit success and appropriate state`() =
-        runBlocking {
+    fun `WHEN fetchProcedureList() THEN emit success and appropriate state`() =
+        runTest {
             // given
             val expectedProcedures = listOf(MockData.procedureMock)
             coEvery { procedureUsecaseMock.getProcedureList() } returns flowOf(
@@ -58,20 +61,25 @@ class MainViewModelTest {
                     expectedProcedures
                 )
             )
+            coEvery { favouritesUsecaseMock.getAllFavoriteItems() } returns flowOf(
+                listOf(MockData.favouriteItemMock)
+            )
 
             // when
+            viewModel.fetchProceduresAndFavourites()
             testDispatcher.scheduler.advanceUntilIdle()
 
             // then
             coVerify { procedureUsecaseMock.getProcedureList() }
+            coVerify { favouritesUsecaseMock.getAllFavoriteItems() }
             assertEquals(viewModel.proceduresState.value.items, expectedProcedures)
             assertFalse(viewModel.proceduresState.value.isLoading)
             assertNull(viewModel.proceduresState.value.error)
         }
 
     @Test
-    fun `GIVEN fetchProcedureList() WHEN loads on init THEN emit failure and appropriate state`() =
-        runBlocking {
+    fun `WHEN fetchProcedureList() THEN emit failure and appropriate state`() =
+        runTest {
             // given
             val exception = Throwable("failure")
             coEvery { procedureUsecaseMock.getProcedureList() } returns flowOf(
@@ -79,19 +87,24 @@ class MainViewModelTest {
                     exception
                 )
             )
+            coEvery { favouritesUsecaseMock.getAllFavoriteItems() } returns flowOf(
+                listOf(MockData.favouriteItemMock)
+            )
 
             // when
+            viewModel.fetchProceduresAndFavourites()
             testDispatcher.scheduler.advanceUntilIdle()
 
             // then
             coVerify { procedureUsecaseMock.getProcedureList() }
+            coVerify { favouritesUsecaseMock.getAllFavoriteItems() }
             assertEquals(viewModel.proceduresState.value.error, exception.toString())
             assertFalse(viewModel.proceduresState.value.isLoading)
             assertNotNull(viewModel.proceduresState.value.error)
         }
 
     @Test
-    fun `WHEN getProcedureDetail() THEN emit success and appropriate state`() = runBlocking {
+    fun `WHEN getProcedureDetail() THEN emit success and appropriate state`() = runTest {
         // given
         val procedureId = "procedureId"
         val expectedProcedureDetail = MockData.procedureDetailMock
@@ -106,18 +119,18 @@ class MainViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
         // then
-        assertEquals(viewModel.proceduresState.value.selectedProcedureDetail, expectedProcedureDetail)
         coVerify { procedureUsecaseMock.getProcedureDetail(procedureId) }
+        assertEquals(viewModel.proceduresState.value.selectedProcedureDetail, expectedProcedureDetail)
         assertFalse(viewModel.proceduresState.value.isLoading)
     }
 
     @Test
     fun `WHEN getProcedureDetail() THEN emit failure and appropriate state`() =
-        runBlocking {
+        runTest {
             // given
             val procedureId = "procedureId"
             val exception = Throwable("failure")
-            coEvery { procedureUsecaseMock.getProcedureList() } returns flowOf(
+            coEvery { procedureUsecaseMock.getProcedureDetail(procedureId) } returns flowOf(
                 Result.Error(
                     exception
                 )
@@ -132,4 +145,6 @@ class MainViewModelTest {
             assertNull(viewModel.proceduresState.value.selectedProcedureDetail)
             assertFalse(viewModel.proceduresState.value.isLoading)
         }
+
+    // D_N: Not going for 100% coverage here, hopefully the tests above & spread across the project demonstrate what I'm capable of
 }

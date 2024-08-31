@@ -8,7 +8,7 @@ class FavouritesRepositoryImpl @Inject constructor(
     private val favouriteItemDao: FavouriteItemDao
 ) : FavouritesRepository {
 
-    // Would usually place error handling for these DB operatons at this layer
+    // D_N: Would usually place error handling for DB operations at this layer
     override suspend fun insertFavouriteItem(favouriteItem: FavouriteItem) {
         favouriteItemDao.insertFavoriteItem(favouriteItem)
     }

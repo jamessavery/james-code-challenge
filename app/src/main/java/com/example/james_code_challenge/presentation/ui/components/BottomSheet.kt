@@ -43,6 +43,7 @@ import com.example.james_code_challenge.data.model.Phase
 import com.example.james_code_challenge.data.model.Procedure
 import com.example.james_code_challenge.data.model.ProcedureDetail
 import com.example.james_code_challenge.mock.MockData
+import com.example.james_code_challenge.presentation.ui.components.BottomSheet.Companion.BOTTOM_SHEET_ERROR_TEST_TAG
 import com.example.james_code_challenge.presentation.ui.components.BottomSheet.Companion.BOTTOM_SHEET_IMAGE_GRID_TAG
 import com.example.james_code_challenge.presentation.ui.components.BottomSheet.Companion.BOTTOM_SHEET_TEST_TAG
 import com.example.james_code_challenge.util.toLocalDate
@@ -51,6 +52,7 @@ import kotlinx.coroutines.launch
 class BottomSheet {
     companion object {
         const val BOTTOM_SHEET_TEST_TAG = "bottom_sheet_test_tag"
+        const val BOTTOM_SHEET_ERROR_TEST_TAG = "bottom_sheet_error_test_tag"
         const val BOTTOM_SHEET_IMAGE_GRID_TAG = "bottom_sheet_image_grid_tag"
     }
 }
@@ -75,11 +77,11 @@ fun PhaseBottomSheet(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .testTag(BOTTOM_SHEET_TEST_TAG)
+                .testTag(BOTTOM_SHEET_ERROR_TEST_TAG)
         ) {
             Text(
                 text = stringResource(R.string.generic_error_message),
-                modifier = Modifier.align(Alignment.Center)
+                modifier = modifier.align(Alignment.Center)
             )
         }
     } else {
@@ -92,7 +94,6 @@ fun PhaseBottomSheet(
                     color = Color.Black,
                     shape = RoundedCornerShape(8.dp)
                 )
-                .testTag(BOTTOM_SHEET_TEST_TAG)
         )
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -103,6 +104,7 @@ fun PhaseBottomSheet(
             Text(text = procedureDetail.name, fontWeight = FontWeight.Bold)
             Spacer(modifier.weight(1f))
             FavouriteButton(
+                modifier = modifier,
                 onClickEvent = {
                     onFavouriteToggleEvent(
                         FavouriteItem(
@@ -131,6 +133,7 @@ fun PhaseBottomSheet(
         Card(
             modifier
                 .padding(4.dp)
+                .testTag(BOTTOM_SHEET_TEST_TAG)
         ) {
             PhaseImageGrid(
                 phaseData = procedureDetail.phases

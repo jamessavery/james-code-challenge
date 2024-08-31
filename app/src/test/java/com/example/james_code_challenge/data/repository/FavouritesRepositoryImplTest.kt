@@ -6,13 +6,12 @@ import com.example.james_code_challenge.mock.MockData
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
 class FavouritesRepositoryImplTest {
-// TODO 1 more test & Fix (test being a end to end? Main point of it is to ensure only 1 call happens at a time..)
-    // TODO CALL VERIFY TO ENSURE THAT CALLS ARE MADE AS WELL AS LAMBDAS?
+
     private val favouriteItemDaoMock = mockk<FavouriteItemDao>(relaxed = true)
 
     private lateinit var favouritesRepository: FavouritesRepository
@@ -23,7 +22,7 @@ class FavouritesRepositoryImplTest {
     }
 
     @Test
-    fun `WHEN insertFavouriteItem() THEN Dao insertFavoriteItem()`() = runBlocking {
+    fun `WHEN insertFavouriteItem() THEN Dao should insertFavoriteItem()`() = runTest {
         // given
         val favouriteItem = FavouriteItem(uuid = "123", procedure = MockData.procedureMock)
 
@@ -35,7 +34,7 @@ class FavouritesRepositoryImplTest {
     }
 
     @Test
-    fun `getAllFavoriteItems should return items from favouriteItemDao`() = runBlocking {
+    fun `WHEN getAllFavoriteItems() THEN Dao should getAllFavoriteItems()`() = runTest {
         // given
         val expectedItems = listOf(FavouriteItem(uuid = "123", procedure = MockData.procedureMock))
         coEvery { favouriteItemDaoMock.getAllFavoriteItems() } returns expectedItems
@@ -45,10 +44,11 @@ class FavouritesRepositoryImplTest {
 
         // then
         assert(actualItems == expectedItems)
+        coVerify { favouriteItemDaoMock.getAllFavoriteItems() }
     }
 
     @Test
-    fun `deleteFavoriteItem should call favouriteItemDao deleteFavoriteItem`() = runBlocking {
+    fun `WHEN deleteFavoriteItem() THEN Dao should deleteFavoriteItem()`() = runTest {
         // given
         val uuid = "123"
 
@@ -57,6 +57,18 @@ class FavouritesRepositoryImplTest {
 
         // then
         coVerify { favouriteItemDaoMock.deleteFavoriteItem(uuid) }
+    }
+
+    @Test
+    fun `WHEN isFavourite() THEN Dao should isFavourite()`() = runTest {
+        // given
+        val uuid = "123"
+
+        // when
+        favouritesRepository.isFavourite(uuid)
+
+        // then
+        coVerify { favouriteItemDaoMock.isFavourite(uuid) }
     }
 
 }

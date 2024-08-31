@@ -1,8 +1,9 @@
 package com.example.james_code_challenge.presentation.viewmodel
 
-import android.app.Application
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.james_code_challenge.Constants.Companion.PROCEDURES_OFFLINE_JSON
 import com.example.james_code_challenge.data.model.FavouriteItem
 import com.example.james_code_challenge.data.model.Procedure
 import com.example.james_code_challenge.data.model.ProcedureDetail
@@ -13,6 +14,7 @@ import com.example.james_code_challenge.util.Result
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +27,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val applicationContext: Application,
+    @ApplicationContext private val context: Context,
     private val procedureUsecase: ProcedureUsecase,
     private val favouritesUsecase: FavouritesUsecase
 ) : ViewModel() {
@@ -41,15 +43,15 @@ class MainViewModel @Inject constructor(
             val favourites = favouritesUsecase.getAllFavoriteItems()
 
             combine(procedures, favourites) { proceduresCall, favouriteItems ->
-                when (proceduresCall) { // Perhaps not the best idea to rely on the success of just API call here, but for sake of this technical
-                    is Result.Success -> onProcedureListSuccess(proceduresCall.data, favouriteItems)
-                    is Result.Error -> onProcedureListFailure(proceduresCall.exception)
+                when (proceduresCall) { // D_N: Perhaps not the best idea to rely on just the success of just API call here, but for sake of this technical
+                    is Result.Success -> fetchProceduresAndFavouritesSuccess(proceduresCall.data, favouriteItems)
+                    is Result.Error -> fetchProceduresAndFavouritesFailure(proceduresCall.exception)
                 }
             }.launchIn(viewModelScope)
         }
     }
 
-    private fun onProcedureListSuccess(
+    private fun fetchProceduresAndFavouritesSuccess(
         procedureList: List<Procedure>,
         favouriteItems: List<FavouriteItem>
     ) {
@@ -65,7 +67,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun onProcedureListFailure(exception: Throwable) {
+    private fun fetchProceduresAndFavouritesFailure(exception: Throwable) {
         if(exception == IOException()) { // Init offline mode
             viewModelScope.launch {
                 _proceduresState.emit(
@@ -94,7 +96,7 @@ class MainViewModel @Inject constructor(
     // but images & procedureDetails are not available
     private fun processOfflineData(): List<Procedure> {
         val jsonFileString =
-            JsonUtils.getJsonFromAssets(applicationContext, "procedures_response.json")
+            JsonUtils.getJsonFromAssets(context, PROCEDURES_OFFLINE_JSON)
         val listUserType: Type = object : TypeToken<List<Procedure>>() {}.type
         val proceduresResponse: List<Procedure> = Gson().fromJson(jsonFileString, listUserType)
         return proceduresResponse
@@ -172,7 +174,7 @@ class MainViewModel @Inject constructor(
     data class ProceduresState(
         val isLoading: Boolean = false,
         val items: List<Procedure> = emptyList(),
-        val error: String? = null, // Would use an ErrorType on actual app
+        val error: String? = null, // D_N: Would use an ErrorType on actual app
         val favouriteItems: List<Procedure> = emptyList(),
         var selectedProcedureDetail: ProcedureDetail? = null,
         var isOffline: Boolean = false
