@@ -10,9 +10,11 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.printToLog
 import androidx.compose.ui.test.swipeDown
 import androidx.test.espresso.Espresso
 import com.example.james_code_challenge.mock.MockData
@@ -53,6 +55,7 @@ class MainActivityTest {
     @Before
     fun setup() {
         hiltRule.inject()
+        composeTestRule.onRoot(useUnmergedTree = true).printToLog("ComposeTestingTag") // Print tags present on screen
     }
 
     @Test

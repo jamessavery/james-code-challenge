@@ -1,6 +1,8 @@
 package com.example.james_code_challenge.presentation.viewmodel
 
 import android.content.Context
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.james_code_challenge.MainCoroutineRule
 import com.example.james_code_challenge.domain.usecase.FavouritesUsecase
 import com.example.james_code_challenge.domain.usecase.ProcedureUsecase
 import com.example.james_code_challenge.mock.MockData
@@ -8,24 +10,26 @@ import com.example.james_code_challenge.util.Result
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
 class MainViewModelTest {
+
+    @get:Rule
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    var mainCoroutineRule = MainCoroutineRule()
 
     private val applicationContextMock = mockk<Context>(relaxed = true)
     private val procedureUsecaseMock = mockk<ProcedureUsecase>(relaxed = true)
@@ -33,22 +37,13 @@ class MainViewModelTest {
 
     private lateinit var viewModel: MainViewModel
 
-    private val testDispatcher = StandardTestDispatcher()
-
     @Before
     fun setup() {
-        Dispatchers.setMain(testDispatcher)
         viewModel = MainViewModel(
             applicationContextMock,
             procedureUsecase = procedureUsecaseMock,
             favouritesUsecase = favouritesUsecaseMock
         )
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-        testDispatcher.cancel()
     }
 
     @Test
@@ -67,7 +62,7 @@ class MainViewModelTest {
 
             // when
             viewModel.fetchProceduresAndFavourites()
-            testDispatcher.scheduler.advanceUntilIdle()
+            advanceUntilIdle()
 
             // then
             coVerify { procedureUsecaseMock.getProcedureList() }
@@ -93,7 +88,7 @@ class MainViewModelTest {
 
             // when
             viewModel.fetchProceduresAndFavourites()
-            testDispatcher.scheduler.advanceUntilIdle()
+            advanceUntilIdle()
 
             // then
             coVerify { procedureUsecaseMock.getProcedureList() }
@@ -116,7 +111,7 @@ class MainViewModelTest {
 
         // when
         viewModel.fetchProcedureDetail(procedureId)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // then
         coVerify { procedureUsecaseMock.getProcedureDetail(procedureId) }
@@ -138,7 +133,7 @@ class MainViewModelTest {
 
             // when
             viewModel.fetchProcedureDetail(procedureId)
-            testDispatcher.scheduler.advanceUntilIdle()
+            advanceUntilIdle()
 
             // then
             coVerify { procedureUsecaseMock.getProcedureDetail(procedureId) }
