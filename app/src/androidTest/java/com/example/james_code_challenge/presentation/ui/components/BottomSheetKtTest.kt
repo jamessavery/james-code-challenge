@@ -11,7 +11,7 @@ import com.example.james_code_challenge.presentation.ui.MainActivity.Companion.F
 import com.example.james_code_challenge.presentation.ui.components.BottomSheet.Companion.BOTTOM_SHEET_ERROR_TEST_TAG
 import com.example.james_code_challenge.presentation.ui.components.BottomSheet.Companion.BOTTOM_SHEET_IMAGE_GRID_TAG
 import com.example.james_code_challenge.presentation.ui.components.BottomSheet.Companion.BOTTOM_SHEET_TEST_TAG
-import com.example.james_code_challenge.util.toLocalDate
+import com.example.james_code_challenge.domain.util.toLocalDate
 import org.junit.Rule
 import org.junit.Test
 

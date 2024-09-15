@@ -1,8 +1,8 @@
-package com.example.james_code_challenge.util
+package com.example.james_code_challenge.domain.util
 
-import com.example.james_code_challenge.util.TimeDateUtils.Companion.TIMEDATE_STRING_CUTOFF
-import com.example.james_code_challenge.util.TimeDateUtils.Companion.OUTPUT_PATTERN
-import com.example.james_code_challenge.util.TimeDateUtils.Companion.PATTERN_STRING
+import com.example.james_code_challenge.domain.util.TimeDateUtils.Companion.TIMEDATE_STRING_CUTOFF
+import com.example.james_code_challenge.domain.util.TimeDateUtils.Companion.OUTPUT_PATTERN
+import com.example.james_code_challenge.domain.util.TimeDateUtils.Companion.PATTERN_STRING
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException

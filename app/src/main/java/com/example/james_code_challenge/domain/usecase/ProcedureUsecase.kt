@@ -2,7 +2,7 @@ package com.example.james_code_challenge.domain.usecase
 
 import com.example.james_code_challenge.data.model.Procedure
 import com.example.james_code_challenge.data.repository.ProcedureRepository
-import com.example.james_code_challenge.util.Result
+import com.example.james_code_challenge.domain.util.Result
 import com.example.james_code_challenge.data.model.ProcedureDetail
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

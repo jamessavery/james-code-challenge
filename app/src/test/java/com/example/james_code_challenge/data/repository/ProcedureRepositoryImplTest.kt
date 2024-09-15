@@ -3,7 +3,7 @@ package com.example.james_code_challenge.data.repository
 import com.example.james_code_challenge.data.model.Procedure
 import com.example.james_code_challenge.mock.MockData
 import com.example.james_code_challenge.services.api.ProcedureApi
-import com.example.james_code_challenge.util.Result
+import com.example.james_code_challenge.domain.util.Result
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

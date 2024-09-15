@@ -9,8 +9,8 @@ import com.example.james_code_challenge.data.model.Procedure
 import com.example.james_code_challenge.data.model.ProcedureDetail
 import com.example.james_code_challenge.domain.usecase.FavouritesUsecase
 import com.example.james_code_challenge.domain.usecase.ProcedureUsecase
-import com.example.james_code_challenge.util.JsonUtils
-import com.example.james_code_challenge.util.Result
+import com.example.james_code_challenge.domain.util.JsonUtils
+import com.example.james_code_challenge.domain.util.Result
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.lifecycle.HiltViewModel

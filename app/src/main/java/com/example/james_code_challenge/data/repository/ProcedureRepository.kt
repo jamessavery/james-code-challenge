@@ -5,7 +5,7 @@ import com.example.james_code_challenge.services.api.ProcedureApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
-import com.example.james_code_challenge.util.Result
+import com.example.james_code_challenge.domain.util.Result
 import com.example.james_code_challenge.data.model.ProcedureDetail
 import kotlin.coroutines.cancellation.CancellationException
 

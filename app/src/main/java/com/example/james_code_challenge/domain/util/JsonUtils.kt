@@ -1,4 +1,4 @@
-package com.example.james_code_challenge.util
+package com.example.james_code_challenge.domain.util
 
 import android.content.Context
 import java.io.IOException

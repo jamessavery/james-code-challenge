@@ -6,7 +6,7 @@ import com.example.james_code_challenge.MainCoroutineRule
 import com.example.james_code_challenge.domain.usecase.FavouritesUsecase
 import com.example.james_code_challenge.domain.usecase.ProcedureUsecase
 import com.example.james_code_challenge.mock.MockData
-import com.example.james_code_challenge.util.Result
+import com.example.james_code_challenge.domain.util.Result
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
